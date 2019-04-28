@@ -1,28 +1,20 @@
 package com.mfanw.scoresort.views;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Toolkit;
-import java.net.URL;
-
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-
 import com.mfanw.scoresort.consts.AppConst;
+
+import javax.swing.*;
+import java.awt.*;
+import java.net.URL;
 
 public class AboutBox1 extends JDialog {
 
     public static final int FRAMEW = 470;
     public static final int FRAMEH = 194;
-
-    private Container mainPanel;
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -6036881259030339187L;
+    private Container mainPanel;
 
     public AboutBox1() {
         initComponents();

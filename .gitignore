@@ -20,4 +20,5 @@ target/
 bin/
 .mvn/
 .idea/
+.idea
 *.iml

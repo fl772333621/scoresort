@@ -4,9 +4,8 @@
  */
 package com.mfanw.scoresort.dao;
 
-import java.io.File;
-
 import javax.swing.filechooser.FileFilter;
+import java.io.File;
 
 /**
  * @author Administrator
@@ -29,9 +28,7 @@ public final class ExcelFilter extends FileFilter {
                 return true;
             }
             String extension = getExtension(f);
-            if (extension != null && extension.equalsIgnoreCase(this.ext)) {
-                return true;
-            }
+            return extension != null && extension.equalsIgnoreCase(this.ext);
         }
         return false;
     }

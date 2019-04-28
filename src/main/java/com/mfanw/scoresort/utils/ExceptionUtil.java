@@ -6,7 +6,6 @@
 package com.mfanw.scoresort.utils;
 
 /**
- *
  * @author mengwei
  */
 public class ExceptionUtil {
@@ -14,8 +13,8 @@ public class ExceptionUtil {
     public static String printStackTraceMgr(StackTraceElement[] stes) {
         StackTraceElement ste;
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < stes.length; i++) {
-            ste = stes[i];
+        for (StackTraceElement stackTraceElement : stes) {
+            ste = stackTraceElement;
             sb.append("at ");
             sb.append(ste.getClassName());
             sb.append(".");

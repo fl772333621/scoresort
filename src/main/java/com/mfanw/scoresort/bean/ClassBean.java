@@ -1,9 +1,9 @@
 package com.mfanw.scoresort.bean;
 
-import java.util.ArrayList;
-
 import com.mfanw.scoresort.utils.ScoreSortUtil;
 import com.mfanw.scoresort.views.ScoreSortSettings;
+
+import java.util.List;
 
 public class ClassBean {
 
@@ -20,7 +20,7 @@ public class ClassBean {
     /**
      * 班级内全部学生
      */
-    private ArrayList<StudentBean> students;
+    private List<StudentBean> students;
 
     /**
      * 每个班每个等级的计数器，degreeDetails[科目][等级]
@@ -48,7 +48,7 @@ public class ClassBean {
 
     private ScoreSortSettings settings;
 
-    public ClassBean(ScoreSortSettings settings, int classIndex, String className, ArrayList<StudentBean> students) {
+    public ClassBean(ScoreSortSettings settings, int classIndex, String className, List<StudentBean> students) {
         this.settings = settings;
         this.classIndex = classIndex;
         this.className = className;
@@ -113,7 +113,7 @@ public class ClassBean {
         return className;
     }
 
-    public ArrayList<StudentBean> getStudents() {
+    public List<StudentBean> getStudents() {
         return students;
     }
 
@@ -124,8 +124,8 @@ public class ClassBean {
     /**
      * 指定科目和级别累计数目增加一<br />
      * 操作前必须保证已经执行了initLevelDegreeDetails对班级的等级信息初始化<br />
-     * 
-     * @param keMu 指定科目
+     *
+     * @param keMu  指定科目
      * @param level 指定级别，如果level==-1表示是无等级的学生，也需要计数
      */
     public void addLevelDegreeDetails(int keMu, int level) {
@@ -137,7 +137,7 @@ public class ClassBean {
     }
 
     /**
-     * @param settings
+     *
      */
     public void initLevelDegreeDetails(ScoreSortSettings settings) {
         this.levelDegreeDetails = new int[settings.getKeMuSize()][settings.getCutNum() + 1];

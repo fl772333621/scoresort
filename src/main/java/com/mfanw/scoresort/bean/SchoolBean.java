@@ -4,15 +4,10 @@
  */
 package com.mfanw.scoresort.bean;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.mfanw.scoresort.utils.ScoreSortUtil;
 import com.mfanw.scoresort.views.ScoreSortSettings;
-import java.util.Collections;
-import java.util.Comparator;
+
+import java.util.*;
 
 /**
  * <b>加载XLS文件即处理：</b><br />
@@ -29,9 +24,9 @@ public class SchoolBean {
     /**
      * 全部学生
      */
-    private ArrayList<StudentBean> students;
+    private List<StudentBean> students;
 
-    private ArrayList<ClassBean> classes = new ArrayList<ClassBean>();
+    private List<ClassBean> classes = new ArrayList<>();
 
     /**
      * 总分最高分
@@ -60,7 +55,7 @@ public class SchoolBean {
     /**
      * 每个班学生数目
      */
-    private int numPerBanJi[];
+    private int[] numPerBanJi;
 
     /**
      * 名次档详情<br />
@@ -77,14 +72,14 @@ public class SchoolBean {
     /**
      * 光荣榜[班类][科目][名次][学生]
      */
-    private ArrayList<ArrayList<Map<Integer, ArrayList<StudentBean>>>> GRB = new ArrayList<ArrayList<Map<Integer, ArrayList<StudentBean>>>>();
+    private List<List<Map<Integer, List<StudentBean>>>> GRB = new ArrayList<>();
 
     private ScoreSortSettings settings;
 
     /**
      * 构造函数
      */
-    public SchoolBean(ScoreSortSettings settings, ArrayList<StudentBean> students) {
+    public SchoolBean(ScoreSortSettings settings, List<StudentBean> students) {
         this.settings = settings;
         this.students = students;
         // 添加总分作为一个特殊科目
@@ -178,12 +173,12 @@ public class SchoolBean {
             return;
         }
         for (int classTypeIndex = 0; classTypeIndex < settings.getGRBClassType().size(); classTypeIndex++) {
-            ArrayList<ClassBean> clas = settings.getGRBClassType().get(classTypeIndex);
-            ArrayList<StudentBean> stusOfClas = new ArrayList<StudentBean>();
+            List<ClassBean> clas = settings.getGRBClassType().get(classTypeIndex);
+            List<StudentBean> stusOfClas = new ArrayList<>();
             for (ClassBean cla : clas) {
                 stusOfClas.addAll(cla.getStudents());
             }
-            ArrayList<Map<Integer, ArrayList<StudentBean>>> classType = new ArrayList<Map<Integer, ArrayList<StudentBean>>>();
+            List<Map<Integer, List<StudentBean>>> classType = new ArrayList<>();
             for (int keMu = 0; keMu < settings.getKeMuSize(); keMu++) {
                 classType.add(ScoreSortUtil.scoreTopX(stusOfClas, keMu, settings.getGRBTopNum()));
             }
@@ -273,9 +268,6 @@ public class SchoolBean {
 
     /**
      * 按照名次档给各科目统计
-     *
-     * @param keMu
-     * @param mingCiDang
      */
     private void handleMingCiDang() {
         // 暂时就是只有六个科目
@@ -309,8 +301,6 @@ public class SchoolBean {
 
     /**
      * 根据名次档详情计算出累计情况
-     *
-     * @param mCDDetail2
      */
     private void handleMCDDetailTotal(final int[][][] mcdDetail) {
         this.MCDDetailTotal = new int[this.classes.size()][this.settings.getKeMuSize()][settings.getMingCiFenDang().length + 1];
@@ -343,16 +333,18 @@ public class SchoolBean {
         return settings.getMingCiFenDang().length;
     }
 
-    public ArrayList<StudentBean> getStudents() {
+    public List<StudentBean> getStudents() {
         return students;
+    }
+
+    public void setStudents(List<StudentBean> students) {
+        this.students = students;
     }
 
     /**
      * 获取学校的全部班级，班级是有序的，名称从小到大
-     *
-     * @return
      */
-    public ArrayList<ClassBean> getClasses() {
+    public List<ClassBean> getClasses() {
         return classes;
     }
 
@@ -367,20 +359,24 @@ public class SchoolBean {
 
     /**
      * MCDDetail[班级][科目][名次档索引]
-     *
-     * @return
      */
     public int[][][] getMCDDetail() {
         return MCDDetail;
     }
 
+    public void setMCDDetail(int[][][] mCDDetail) {
+        MCDDetail = mCDDetail;
+    }
+
     /**
      * getMCDDetailTotal[班级][科目][名次档索引]
-     *
-     * @return
      */
     public int[][][] getMCDDetailTotal() {
         return MCDDetailTotal;
+    }
+
+    public void setMCDDetailTotal(int[][][] mCDDetailTotal) {
+        MCDDetailTotal = mCDDetailTotal;
     }
 
     /**
@@ -392,19 +388,14 @@ public class SchoolBean {
         for (int i = 0; i < students.size(); i++) {
             ArrayList<StudentBean> classStudent = classStudents.get(students.get(i).getClassName());
             if (classStudent == null) {
-                classStudent = new ArrayList<StudentBean>();
+                classStudent = new ArrayList<>();
             }
             classStudent.add(students.get(i));
             classStudents.put(students.get(i).getClassName(), classStudent);
         }
         String[] classNames = classStudents.keySet().toArray(new String[0]);
         ArrayList<String> classNameList = new ArrayList<>(Arrays.asList(classNames));
-        Collections.sort(classNameList, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return Integer.parseInt(o1) - Integer.parseInt(o2);
-            }
-        });
+        Collections.sort(classNameList, (o1, o2) -> Integer.parseInt(o1) - Integer.parseInt(o2));
         for (int i = 0; i < classNameList.size(); i++) {
             this.classes.add(new ClassBean(settings, i, classNameList.get(i), classStudents.get(classNameList.get(i))));
         }
@@ -451,7 +442,6 @@ public class SchoolBean {
      *
      * @param High
      * @param Low
-     * @param PianCha
      */
     public void handleXScoreDegree(double High, double Low) {
         // 正常的偏差是0，偏差的计算方法是 Low+x-1-第一个存储值 x表示x分一档
@@ -490,7 +480,6 @@ public class SchoolBean {
     /**
      * 返回的是 划分各个等级的分数线
      *
-     * @param score 全部学生的单科成绩
      * @param cutNum 分等级的个数
      * @return
      */
@@ -520,8 +509,16 @@ public class SchoolBean {
         return scoresHigh;
     }
 
+    public void setScoresHigh(double[] scoresHigh) {
+        this.scoresHigh = scoresHigh;
+    }
+
     public double[] getScoresLow() {
         return scoresLow;
+    }
+
+    public void setScoresLow(double[] scoresLow) {
+        this.scoresLow = scoresLow;
     }
 
     public int getXScore() {
@@ -552,27 +549,7 @@ public class SchoolBean {
         this.numPerBanJi = numPerBanJi;
     }
 
-    public void setStudents(ArrayList<StudentBean> students) {
-        this.students = students;
-    }
-
-    public void setScoresHigh(double[] scoresHigh) {
-        this.scoresHigh = scoresHigh;
-    }
-
-    public void setScoresLow(double[] scoresLow) {
-        this.scoresLow = scoresLow;
-    }
-
-    public void setMCDDetail(int[][][] mCDDetail) {
-        MCDDetail = mCDDetail;
-    }
-
-    public void setMCDDetailTotal(int[][][] mCDDetailTotal) {
-        MCDDetailTotal = mCDDetailTotal;
-    }
-
-    public ArrayList<ArrayList<Map<Integer, ArrayList<StudentBean>>>> getGRB() {
+    public List<List<Map<Integer, List<StudentBean>>>> getGRB() {
         return GRB;
     }
 

@@ -1,9 +1,10 @@
 package com.mfanw.scoresort.views;
 
-import java.util.ArrayList;
-
 import com.mfanw.scoresort.bean.ClassBean;
 import com.mfanw.scoresort.bean.SchoolBean;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScoreSortSettings {
 
@@ -47,7 +48,7 @@ public class ScoreSortSettings {
     /**
      * 光荣榜班类集合
      */
-    private ArrayList<ArrayList<ClassBean>> GRBClassType;
+    private List<List<ClassBean>> GRBClassType;
 
     /**
      * 光荣榜截取前X名，默认X=3
@@ -87,10 +88,14 @@ public class ScoreSortSettings {
         return degreeScores;
     }
 
+    public void setDegreeScores(double[][] degreeScores) {
+        this.degreeScores = degreeScores;
+    }
+
     /**
      * 给科目设置等级分数线（每个等级的最低分数）
      *
-     * @param keMu 科目
+     * @param keMu        科目
      * @param degreeScore 等级分数线（每个等级的最低分数）
      */
     public void setDegreeScore(int keMu, double[] degreeScore) {
@@ -105,16 +110,16 @@ public class ScoreSortSettings {
         this.stuPerDegree = stuPerDegree;
     }
 
-    public void setDegreeScores(double[][] degreeScores) {
-        this.degreeScores = degreeScores;
-    }
-
     public int getScoreDegreePC() {
         return scoreDegreePC;
     }
 
     public void setScoreDegreePC(int scoreDegreePC) {
         this.scoreDegreePC = scoreDegreePC;
+    }
+
+    public int[] getMingCiFenDang() {
+        return mingCiFenDang;
     }
 
     public void setMingCiFenDang(String MCFD) {
@@ -126,16 +131,12 @@ public class ScoreSortSettings {
         this.mingCiFenDang = tempTFInt;
     }
 
-    public int[] getMingCiFenDang() {
-        return mingCiFenDang;
-    }
-
-    public ArrayList<ArrayList<ClassBean>> getGRBClassType() {
+    public List<List<ClassBean>> getGRBClassType() {
         return GRBClassType;
     }
 
     public void setGRBClassType(String gRBClassType, SchoolBean school) {
-        GRBClassType = new ArrayList<ArrayList<ClassBean>>();
+        GRBClassType = new ArrayList<>();
         if (gRBClassType == null || gRBClassType.length() == 0) {
             this.GRBClassType.add(school.getClasses());
             this.GRBClassTypeText = new String[]{"全部"};
@@ -186,20 +187,20 @@ public class ScoreSortSettings {
         return distribution;
     }
 
-    public String[] getDistributionName() {
-        return distributionName;
-    }
-
-    public double[] getDistributionPercent() {
-        return distributionPercent;
-    }
-
     public void setDistribution(boolean distribution) {
         this.distribution = distribution;
     }
 
+    public String[] getDistributionName() {
+        return distributionName;
+    }
+
     public void setDistributionName(String[] distributionName) {
         this.distributionName = distributionName;
+    }
+
+    public double[] getDistributionPercent() {
+        return distributionPercent;
     }
 
     public void setDistributionPercent(double[] distributionPercent) {

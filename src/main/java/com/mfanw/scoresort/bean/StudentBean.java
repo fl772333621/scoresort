@@ -50,8 +50,8 @@ public class StudentBean {
     public double[] getScores() {
         return scores;
     }
-    
-    public void setScoreByIndex(int index, double score){
+
+    public void setScoreByIndex(int index, double score) {
         this.scores[index] = score;
     }
 
@@ -81,8 +81,8 @@ public class StudentBean {
 
     /**
      * 根据科目设置等级
-     * 
-     * @param keMu 科目
+     *
+     * @param keMu        科目
      * @param scoreDegree 等级
      */
     public void setScoreDegree(int keMu, String scoreDegree) {
@@ -91,8 +91,8 @@ public class StudentBean {
 
     /**
      * 根据科目设置班级排名
-     * 
-     * @param keMu 科目
+     *
+     * @param keMu           科目
      * @param scoreRankClass 班级排名
      */
     public void setScoreRankClass(int keMu, int scoreRankClass) {
@@ -101,8 +101,8 @@ public class StudentBean {
 
     /**
      * 根据科目设置校排名
-     * 
-     * @param keMu 科目
+     *
+     * @param keMu            科目
      * @param scoreRankSchool 校排名
      */
     public void setScoreRankSchool(int keMu, int scoreRankSchool) {

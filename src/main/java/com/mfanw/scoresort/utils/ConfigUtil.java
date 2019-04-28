@@ -5,23 +5,26 @@
  */
 package com.mfanw.scoresort.utils;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
 
 /**
- *
  * @author mengwei
  */
 public class ConfigUtil {
 
     private static Map<String, String> configs = null;
 
-    public static void reloadConfigs() {
+    private ConfigUtil() {
+    }
+
+    private static void reloadConfigs() {
         try {
             configs = new HashMap<>();
             File file = new File("score_sort.cfg");
@@ -61,9 +64,7 @@ public class ConfigUtil {
 
     private static void saveConfigsInner() {
         StringBuilder sb = new StringBuilder();
-        configs.entrySet().forEach((entry) -> {
-            sb.append(entry.getKey()).append("=").append(entry.getValue()).append("\r\n");
-        });
+        configs.forEach((key, value) -> sb.append(key).append("=").append(value).append("\r\n"));
         try {
             FileUtils.writeStringToFile(new File("score_sort.cfg"), sb.toString(), "UTF-8");
         } catch (IOException ex) {

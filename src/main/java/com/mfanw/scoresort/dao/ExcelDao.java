@@ -1,29 +1,23 @@
 package com.mfanw.scoresort.dao;
 
+import com.mfanw.scoresort.bean.SchoolBean;
+import com.mfanw.scoresort.bean.StudentBean;
+import com.mfanw.scoresort.views.ScoreSortSettings;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.biff.DisplayFormat;
+import jxl.format.VerticalAlignment;
+import jxl.write.Number;
+import jxl.write.*;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-
-import com.mfanw.scoresort.bean.SchoolBean;
-import com.mfanw.scoresort.bean.StudentBean;
-import com.mfanw.scoresort.views.ScoreSortSettings;
-
-import jxl.Sheet;
-import jxl.Workbook;
-import jxl.biff.DisplayFormat;
-import jxl.format.VerticalAlignment;
-import jxl.write.Label;
-import jxl.write.Number;
-import jxl.write.NumberFormat;
-import jxl.write.NumberFormats;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
 
 /**
  * @author Administrator
@@ -34,14 +28,16 @@ public class ExcelDao {
 
     private static String[] subjects = new String[7];
 
+    private ExcelDao() {
+    }
+
     /**
      * 加载Excel文件到Vector<Vector(String)>中<br/ >
      * 每行数据包装成一个Vector,再把所有行包装成一个Vector返回
      *
      * @param xlsPath 需要加载的Excel的文件目录
-     * @return
      */
-    public static ArrayList<StudentBean> loadExcel(String xlsPath) throws Exception {
+    public static List<StudentBean> loadExcel(String xlsPath) throws Exception {
         ArrayList<StudentBean> xlsContents = new ArrayList<>();
         InputStream is = null;
         Workbook wb = null;
@@ -71,15 +67,19 @@ public class ExcelDao {
             throw e;
         } finally {
             try {
-                wb.close();
-                is.close();
+                if (wb != null) {
+                    wb.close();
+                }
+                if (is != null) {
+                    is.close();
+                }
             } catch (Exception e) {
             }
         }
         return xlsContents;
     }
 
-    public static ArrayList<StudentBean> loadExcel(String xlsPath, int maxMingCi, double lessScore) {
+    public static List<StudentBean> loadExcel(String xlsPath, int maxMingCi, double lessScore) {
         ArrayList<StudentBean> xlsContents = new ArrayList<>();
         InputStream is = null;
         Workbook wb = null;
@@ -106,8 +106,12 @@ public class ExcelDao {
 
         } finally {
             try {
-                wb.close();
-                is.close();
+                if (wb != null) {
+                    wb.close();
+                }
+                if (is != null) {
+                    is.close();
+                }
             } catch (Exception e) {
             }
         }
@@ -138,9 +142,8 @@ public class ExcelDao {
      * 新建Excel文件
      *
      * @param xlsPath 保存目录
-     * @param xlsContents 需要保存的内容
      */
-    public static void saveExcel(String xlsPath, ArrayList<StudentBean> stus, SchoolBean school, ScoreSortSettings settings) {
+    public static void saveExcel(String xlsPath, List<StudentBean> stus, SchoolBean school, ScoreSortSettings settings) {
         stus = new ArrayList<>(stus);
         WritableWorkbook wb = null;
         OutputStream os = null;
@@ -416,7 +419,7 @@ public class ExcelDao {
 
             }
             // -------------------光荣榜-------------------
-            ArrayList<ArrayList<Map<Integer, ArrayList<StudentBean>>>> grb = school.getGRB();
+            List<List<Map<Integer, List<StudentBean>>>> grb = school.getGRB();
             WritableSheet[] grbSheet = new WritableSheet[grb.size()];// 创建一个工作表
             for (int classTypeIndex = 0; classTypeIndex < grb.size(); classTypeIndex++) {
                 grbSheet[classTypeIndex] = wb.createSheet(settings.getGRBClassTypeText()[classTypeIndex] + "班光荣榜", sheet.length + classTypeIndex);
@@ -434,7 +437,7 @@ public class ExcelDao {
                 grbSheet[classTypeIndex].addCell(lb);
                 yIndex++;
                 for (int keMu = 0; keMu < settings.getKeMuSize(); keMu++) {
-                    ArrayList<StudentBean> mc1Stus = grb.get(classTypeIndex).get(keMu).get(1);
+                    List<StudentBean> mc1Stus = grb.get(classTypeIndex).get(keMu).get(1);
                     for (StudentBean mc1Stu : mc1Stus) {
                         lb = new Label(0, yIndex, subjects[keMu], border);
                         grbSheet[classTypeIndex].addCell(lb);
@@ -471,13 +474,13 @@ public class ExcelDao {
                     grbSheet[classTypeIndex].addCell(lb);
                     lb = new Label(keMu * keMuSpace + 6, yIndex + 1, "分数", border);
                     grbSheet[classTypeIndex].addCell(lb);
-                    Map<Integer, ArrayList<StudentBean>> grbInfo = grb.get(classTypeIndex).get(keMu);
+                    Map<Integer, List<StudentBean>> grbInfo = grb.get(classTypeIndex).get(keMu);
                     Integer[] mcArray = grbInfo.keySet().toArray(new Integer[0]);
                     Arrays.sort(mcArray);
                     int yIndexTemp = yIndex;
                     // 科目内具体信息
                     for (int mc : mcArray) {
-                        ArrayList<StudentBean> grbStus = grbInfo.get(mc);
+                        List<StudentBean> grbStus = grbInfo.get(mc);
                         for (int sIndex = 0; sIndex < grbStus.size(); sIndex++) {
                             num = new Number(keMu * keMuSpace, yIndexTemp + 2, mc, border);
                             grbSheet[classTypeIndex].addCell(num);
