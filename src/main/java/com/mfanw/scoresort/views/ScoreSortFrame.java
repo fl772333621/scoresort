@@ -14,7 +14,6 @@ import com.mfanw.scoresort.utils.ExceptionUtil;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,8 +22,6 @@ import java.util.logging.Logger;
  * @author mengwei
  */
 public class ScoreSortFrame extends javax.swing.JFrame {
-
-    private boolean isNormalDegree = true;
 
     private MessageBox messagesBox = null;
 
@@ -223,9 +220,8 @@ public class ScoreSortFrame extends javax.swing.JFrame {
         });
 
         jLabel2.setText("每等第内数目:");
-
         jTFAdvance.setEditable(false);
-        jTFAdvance.setText("A,B+,B,C+,C,D+,D,E/0.03,0.07,0.16,0.24,0.24,0.16,0.07,0.03");
+        jTFAdvance.setText("A,B,C,D,E/0.15,0.35,0.35,0.13,0.02");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, jRBNormal, org.jdesktop.beansbinding.ELProperty.create("${selected}"), jTFNumPerDD, org.jdesktop.beansbinding.BeanProperty.create("editable"));
         bindingGroup.addBinding(binding);
@@ -554,7 +550,7 @@ public class ScoreSortFrame extends javax.swing.JFrame {
             } else {
                 saveName += "-" + settings.getCutNum() + "级划分";
             }
-            saveName += "-" + school.getXScore() + "分一档.xls";
+            saveName += "-" + school.getxScore() + "分一档.xls";
             settings.setMingCiFenDang(this.jTFMingCiFenDang.getText());
             settings.setGRBClassType(this.jTFGRBClassType.getText(), school);
             settings.setGRBTopNum(this.jTFGRBTopNum.getText());
@@ -625,7 +621,7 @@ public class ScoreSortFrame extends javax.swing.JFrame {
             high++;
             jCBXPerDangPC.addItem(message);
         }
-        school.setXScore(xScore);
+        school.setxScore(xScore);
     }
 
     private void afterInitComponents() {

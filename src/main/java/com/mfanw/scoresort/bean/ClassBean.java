@@ -30,12 +30,12 @@ public class ClassBean {
     /**
      * 各班各科及格率[科目]
      */
-    private double[] JGL;
+    private double[] passRates;
 
     /**
      * 各班各科平均分[科目]
      */
-    private double[] PJF;
+    private double[] averages;
 
     /**
      * 各科最高分[科目]
@@ -54,34 +54,34 @@ public class ClassBean {
         this.className = className;
         this.students = students;
         initScoresHighLow();
-        initJGL();
-        initPJF();
+        initPassRate();
+        initAverage();
         ScoreSortUtil.scoreSortRankMark(students, ScoreSortUtil.RANK_CLASS);
     }
 
     /**
      * 初始化及格率
      */
-    private void initJGL() {
-        this.JGL = new double[this.settings.getKeMuSize()];
+    private void initPassRate() {
+        this.passRates = new double[this.settings.getKeMuSize()];
         for (int keMu = 0; keMu < this.settings.getKeMuSize(); keMu++) {
             double jgNum = ScoreSortUtil.scoreBetween(students, keMu, settings.getJGLow()[keMu], Double.MAX_VALUE).size();
-            this.JGL[keMu] = jgNum / students.size();
+            this.passRates[keMu] = jgNum / students.size();
         }
     }
 
     /**
      * 初始化平均分
      */
-    private void initPJF() {
-        this.PJF = new double[this.settings.getKeMuSize()];
+    private void initAverage() {
+        this.averages = new double[this.settings.getKeMuSize()];
         for (int i = 0; i < students.size(); i++) {
             for (int keMu = 0; keMu < this.settings.getKeMuSize(); keMu++) {
-                this.PJF[keMu] += students.get(i).getScores()[keMu];
+                this.averages[keMu] += students.get(i).getScores()[keMu];
             }
         }
         for (int keMu = 0; keMu < this.settings.getKeMuSize(); keMu++) {
-            this.PJF[keMu] = this.PJF[keMu] / students.size();
+            this.averages[keMu] = this.averages[keMu] / students.size();
         }
     }
 
@@ -143,12 +143,12 @@ public class ClassBean {
         this.levelDegreeDetails = new int[settings.getKeMuSize()][settings.getCutNum() + 1];
     }
 
-    public double[] getJGL() {
-        return JGL;
+    public double[] getPassRates() {
+        return passRates;
     }
 
-    public double[] getPJF() {
-        return PJF;
+    public double[] getAverages() {
+        return averages;
     }
 
     public double[] getScoresHigh() {

@@ -40,17 +40,17 @@ public class SchoolBean {
     /**
      * X分一档：X具体值
      */
-    private int XScore = 5;
+    private int xScore = 5;
 
     /**
      * X分一档：分割线列表,记录的分档的最大分，根据XScore可以计算出每一档的最小分
      */
-    private long[] XScoreDang;
+    private long[] xScoreDang;
 
     /**
      * X分一档：分割线列表内的学生个数
      */
-    private int[] XScoreDangStuNum;
+    private int[] xScoreDangStuNum;
 
     /**
      * 每个班学生数目
@@ -59,20 +59,20 @@ public class SchoolBean {
 
     /**
      * 名次档详情<br />
-     * MCDDetail[班级][科目][名次档索引]
+     * mcdDetail[班级][科目][名次档索引]
      */
-    private int[][][] MCDDetail;
+    private int[][][] mcdDetail;
 
     /**
      * 名次档累计详情<br />
-     * MCDDetail[班级][科目][名次档索引]
+     * mcdDetail[班级][科目][名次档索引]
      */
-    private int[][][] MCDDetailTotal;
+    private int[][][] mcdDetailTotal;
 
     /**
      * 光荣榜[班类][科目][名次][学生]
      */
-    private List<List<Map<Integer, List<StudentBean>>>> GRB = new ArrayList<>();
+    private List<List<Map<Integer, List<StudentBean>>>> glories = new ArrayList<>();
 
     private ScoreSortSettings settings;
 
@@ -106,7 +106,7 @@ public class SchoolBean {
         }
         for (int keMu = 0; keMu < settings.getKeMuSize(); keMu++) {
             final int keMuIndex = keMu;
-            Collections.sort(students, (StudentBean o1, StudentBean o2) -> {
+            students.sort((o1, o2) -> {
                 if (o1 == null || o1.getScores() == null || o1.getScores().length < keMuIndex) {
                     return -1;
                 }
@@ -120,8 +120,8 @@ public class SchoolBean {
             double[] degreeLScore = new double[settings.getDistributionPercent().length];
             double totalPercent = 0;
             int lastIndex = 0;
-            double[] standarHScore = new double[]{100, 90, 80, 70, 60, 50, 40, 30};
-            double[] standarLScore = new double[]{91, 81, 71, 61, 51, 41, 31, 21};
+            double[] standarHScore = new double[]{100, 85, 70, 55, 40};
+            double[] standarLScore = new double[]{86, 71, 56, 41, 30};
             for (int i = 0; i < settings.getDistributionPercent().length; i++) {
                 // 此处有分数重叠问题
                 int studentIndex = (int) Math.round(students.size() * totalPercent);
@@ -168,8 +168,8 @@ public class SchoolBean {
     }
 
     private void handleGRB() {
-        this.GRB.clear();
-        if (settings.getGRBClassType() == null || settings.getGRBClassType().size() == 0) {
+        this.glories.clear();
+        if (settings.getGRBClassType() == null || settings.getGRBClassType().isEmpty()) {
             return;
         }
         for (int classTypeIndex = 0; classTypeIndex < settings.getGRBClassType().size(); classTypeIndex++) {
@@ -182,7 +182,7 @@ public class SchoolBean {
             for (int keMu = 0; keMu < settings.getKeMuSize(); keMu++) {
                 classType.add(ScoreSortUtil.scoreTopX(stusOfClas, keMu, settings.getGRBTopNum()));
             }
-            this.GRB.add(classType);
+            this.glories.add(classType);
         }
     }
 
@@ -214,14 +214,17 @@ public class SchoolBean {
             settings.setCutNum(settings.getDistributionPercent().length);
             for (int keMu = 0; keMu < settings.getKeMuSize(); keMu++) {
                 final int keMuIndex = keMu;
-                Collections.sort(students, (StudentBean o1, StudentBean o2) -> {
-                    if (o1 == null || o1.getScores() == null || o1.getScores().length < keMuIndex) {
-                        return -1;
+                students.sort(new Comparator<StudentBean>() {
+                    @Override
+                    public int compare(StudentBean o1, StudentBean o2) {
+                        if (o1 == null || o1.getScores() == null || o1.getScores().length < keMuIndex) {
+                            return -1;
+                        }
+                        if (o2 == null || o2.getScores() == null || o2.getScores().length < keMuIndex) {
+                            return 1;
+                        }
+                        return new Double(o1.getScores()[keMuIndex]).compareTo(o2.getScores()[keMuIndex]);
                     }
-                    if (o2 == null || o2.getScores() == null || o2.getScores().length < keMuIndex) {
-                        return 1;
-                    }
-                    return new Double(o1.getScores()[keMuIndex]).compareTo(o2.getScores()[keMuIndex]);
                 });
                 Collections.reverse(students);
                 double[] degreeLScore = new double[settings.getDistributionPercent().length];
@@ -274,12 +277,12 @@ public class SchoolBean {
         if (settings.getMingCiFenDang().length <= 0) {
             return;
         }
-        this.MCDDetail = new int[this.classes.size()][this.settings.getKeMuSize()][settings.getMingCiFenDang().length + 1];
+        this.mcdDetail = new int[this.classes.size()][this.settings.getKeMuSize()][settings.getMingCiFenDang().length + 1];
         // 默认设置各档都是0
         for (int i = 0; i < this.classes.size(); i++) {
             for (int j = 0; j < this.settings.getKeMuSize(); j++) {
                 for (int k = 0; k < settings.getMingCiFenDang().length + 1; k++) {
-                    this.MCDDetail[i][j][k] = 0;
+                    this.mcdDetail[i][j][k] = 0;
                 }
             }
         }
@@ -292,25 +295,25 @@ public class SchoolBean {
             for (int i = 0; i < this.settings.getKeMuSize(); i++) {
                 int tempMingCiDang = judgeMingCiDang(student.getScoresRankSchool()[i]);
                 if (tempMingCiDang >= 0) {
-                    this.MCDDetail[banJiIndex][i][tempMingCiDang]++;
+                    this.mcdDetail[banJiIndex][i][tempMingCiDang]++;
                 }
             }
         }
-        handleMCDDetailTotal(MCDDetail);
+        handleMCDDetailTotal(mcdDetail);
     }
 
     /**
      * 根据名次档详情计算出累计情况
      */
     private void handleMCDDetailTotal(final int[][][] mcdDetail) {
-        this.MCDDetailTotal = new int[this.classes.size()][this.settings.getKeMuSize()][settings.getMingCiFenDang().length + 1];
+        this.mcdDetailTotal = new int[this.classes.size()][this.settings.getKeMuSize()][settings.getMingCiFenDang().length + 1];
         // 默认设置各档都是0
         for (int i = 0; i < this.classes.size(); i++) {
             for (int j = 0; j < this.settings.getKeMuSize(); j++) {
                 int temp = 0;
                 for (int k = 0; k < settings.getMingCiFenDang().length + 1; k++) {
                     temp += mcdDetail[i][j][k];
-                    this.MCDDetailTotal[i][j][k] = temp;
+                    this.mcdDetailTotal[i][j][k] = temp;
                 }
             }
         }
@@ -358,25 +361,25 @@ public class SchoolBean {
     }
 
     /**
-     * MCDDetail[班级][科目][名次档索引]
+     * mcdDetail[班级][科目][名次档索引]
      */
-    public int[][][] getMCDDetail() {
-        return MCDDetail;
+    public int[][][] getMcdDetail() {
+        return mcdDetail;
     }
 
-    public void setMCDDetail(int[][][] mCDDetail) {
-        MCDDetail = mCDDetail;
+    public void setMcdDetail(int[][][] mCDDetail) {
+        mcdDetail = mCDDetail;
     }
 
     /**
-     * getMCDDetailTotal[班级][科目][名次档索引]
+     * getMcdDetailTotal[班级][科目][名次档索引]
      */
-    public int[][][] getMCDDetailTotal() {
-        return MCDDetailTotal;
+    public int[][][] getMcdDetailTotal() {
+        return mcdDetailTotal;
     }
 
-    public void setMCDDetailTotal(int[][][] mCDDetailTotal) {
-        MCDDetailTotal = mCDDetailTotal;
+    public void setMcdDetailTotal(int[][][] mCDDetailTotal) {
+        mcdDetailTotal = mCDDetailTotal;
     }
 
     /**
@@ -384,9 +387,9 @@ public class SchoolBean {
      */
     private void initClassDetails() {
         // 班级内学生列表，存储所有的<班级名称, 班级内学生>
-        HashMap<String, ArrayList<StudentBean>> classStudents = new HashMap<String, ArrayList<StudentBean>>();
+        HashMap<String, List<StudentBean>> classStudents = new HashMap<>();
         for (int i = 0; i < students.size(); i++) {
-            ArrayList<StudentBean> classStudent = classStudents.get(students.get(i).getClassName());
+            List<StudentBean> classStudent = classStudents.get(students.get(i).getClassName());
             if (classStudent == null) {
                 classStudent = new ArrayList<>();
             }
@@ -395,7 +398,7 @@ public class SchoolBean {
         }
         String[] classNames = classStudents.keySet().toArray(new String[0]);
         ArrayList<String> classNameList = new ArrayList<>(Arrays.asList(classNames));
-        Collections.sort(classNameList, (o1, o2) -> Integer.parseInt(o1) - Integer.parseInt(o2));
+        classNameList.sort(Comparator.comparingInt(Integer::parseInt));
         for (int i = 0; i < classNameList.size(); i++) {
             this.classes.add(new ClassBean(settings, i, classNameList.get(i), classStudents.get(classNameList.get(i))));
         }
@@ -407,7 +410,7 @@ public class SchoolBean {
      * @param className 班级名称
      * @return -1表示不在，其余表示在
      */
-    public int findBJIndex(String className) {
+    private int findBJIndex(String className) {
         for (int i = 0; i < this.classes.size(); i++) {
             if (className.equals(this.classes.get(i).getClassName())) {
                 return this.classes.get(i).getClassIndex();
@@ -439,38 +442,35 @@ public class SchoolBean {
 
     /**
      * 根据最高分和最低分以及偏差获取分档表，存储在XScoreDang中
-     *
-     * @param High
-     * @param Low
      */
-    public void handleXScoreDegree(double High, double Low) {
+    private void handleXScoreDegree(double high, double low) {
         // 正常的偏差是0，偏差的计算方法是 Low+x-1-第一个存储值 x表示x分一档
         int scoreDegreePC = settings.getScoreDegreePC();
-        long ZFHigh = Math.round(getScoresHigh()[this.settings.getKeMuSize() - 1]);
-        long ZFLow = Math.round(getScoresLow()[this.settings.getKeMuSize() - 1]);
+        long zfHigh = Math.round(getScoresHigh()[this.settings.getKeMuSize() - 1]);
+        long zfLow = Math.round(getScoresLow()[this.settings.getKeMuSize() - 1]);
         // 根据最高分和最低分以及偏差获取分档表，存储在XScoreDang中
-        int fdNum = (int) ((ZFHigh - ZFLow + scoreDegreePC + settings.getCutNum()) / settings.getCutNum());
+        int fdNum = (int) ((zfHigh - zfLow + scoreDegreePC + settings.getCutNum()) / settings.getCutNum());
         // 创建分档列表
-        XScoreDang = new long[fdNum];
-        int firstScoreDang = (int) ((ZFHigh - ZFLow) % settings.getCutNum());
+        xScoreDang = new long[fdNum];
+        int firstScoreDang = (int) ((zfHigh - zfLow) % settings.getCutNum());
         // 根据分数存储分档列表
-        for (int i = 0; i < XScoreDang.length; i++) {
-            XScoreDang[i] = firstScoreDang + scoreDegreePC + XScore * i;
+        for (int i = 0; i < xScoreDang.length; i++) {
+            xScoreDang[i] = firstScoreDang + scoreDegreePC + xScore * i;
         }
         // 创建统计列表
-        XScoreDangStuNum = new int[fdNum];
+        xScoreDangStuNum = new int[fdNum];
         // 初始化统计列表
-        for (int i = 0; i < XScoreDangStuNum.length; i++) {
-            XScoreDangStuNum[i] = 0;
+        for (int i = 0; i < xScoreDangStuNum.length; i++) {
+            xScoreDangStuNum[i] = 0;
         }
         // 开始统计,填充统计列表
         double tZF = 0;
         for (int i = 0; i < students.size(); i++) {
             tZF = students.get(i).getScores()[this.settings.getKeMuSize() - 1];
             // 从小到大循环分档，直到找到合适的分档（从小到大分档分数线逐渐提高）
-            for (int mm = 0; mm < XScoreDang.length; mm++) {
-                if (tZF < XScoreDang[mm]) {
-                    XScoreDangStuNum[mm]++;
+            for (int mm = 0; mm < xScoreDang.length; mm++) {
+                if (tZF < xScoreDang[mm]) {
+                    xScoreDangStuNum[mm]++;
                     break;
                 }
             }
@@ -481,9 +481,8 @@ public class SchoolBean {
      * 返回的是 划分各个等级的分数线
      *
      * @param cutNum 分等级的个数
-     * @return
      */
-    public double[] scoreCut(int keMu, int cutNum) {
+    private double[] scoreCut(int keMu, int cutNum) {
         double[] ret = new double[cutNum];
         int containNum = settings.getStuPerDegree();
         double[] score = new double[this.students.size()];
@@ -521,24 +520,24 @@ public class SchoolBean {
         this.scoresLow = scoresLow;
     }
 
-    public int getXScore() {
-        return XScore;
+    public int getxScore() {
+        return xScore;
     }
 
-    public void setXScore(int xScore) {
-        XScore = xScore;
+    public void setxScore(int xScore) {
+        this.xScore = xScore;
     }
 
-    public long[] getXScoreDang() {
-        return XScoreDang;
+    public long[] getxScoreDang() {
+        return xScoreDang;
     }
 
-    public int[] getXScoreDangStuNum() {
-        return XScoreDangStuNum;
+    public int[] getxScoreDangStuNum() {
+        return xScoreDangStuNum;
     }
 
-    public void setXScoreDangStuNum(int[] xScoreDangStuNum) {
-        XScoreDangStuNum = xScoreDangStuNum;
+    public void setxScoreDangStuNum(int[] xScoreDangStuNum) {
+        this.xScoreDangStuNum = xScoreDangStuNum;
     }
 
     public int[] getNumPerBanJi() {
@@ -549,8 +548,8 @@ public class SchoolBean {
         this.numPerBanJi = numPerBanJi;
     }
 
-    public List<List<Map<Integer, List<StudentBean>>>> getGRB() {
-        return GRB;
+    public List<List<Map<Integer, List<StudentBean>>>> getGlories() {
+        return glories;
     }
 
 }

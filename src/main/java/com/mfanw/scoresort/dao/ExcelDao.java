@@ -257,7 +257,7 @@ public class ExcelDao {
                 lb = new Label(0, 13 + keMu, subjects[keMu], border);
                 sheet[1].addCell(lb);
                 for (int ii = 0; ii < school.getClasses().size(); ii++) {
-                    num = new Number(ii + 1, 13 + keMu, school.getClasses().get(ii).getJGL()[keMu], percentFormat);
+                    num = new Number(ii + 1, 13 + keMu, school.getClasses().get(ii).getPassRates()[keMu], percentFormat);
                     sheet[1].addCell(num);
                 }
             }
@@ -272,7 +272,7 @@ public class ExcelDao {
                 lb = new Label(0, 22 + keMu, subjects[keMu], border);
                 sheet[1].addCell(lb);
                 for (int ii = 0; ii < school.getClasses().size(); ii++) {
-                    num = new Number(ii + 1, 22 + keMu, school.getClasses().get(ii).getPJF()[keMu], point2Format);
+                    num = new Number(ii + 1, 22 + keMu, school.getClasses().get(ii).getAverages()[keMu], point2Format);
                     sheet[1].addCell(num);
                 }
             }
@@ -299,7 +299,7 @@ public class ExcelDao {
             }
 
             int[] mingCiDang = settings.getMingCiFenDang();
-            int[][][] MCDDetailTotal = school.getMCDDetailTotal();
+            int[][][] MCDDetailTotal = school.getMcdDetailTotal();
             for (int djs = 0; djs < mingCiDang.length; djs++) {
                 for (int i = 2; i < 9; i++) {
                     lb = new Label(djs + settings.getCutNum() + 4, 0, "前" + mingCiDang[djs] + "名", border);
@@ -372,12 +372,12 @@ public class ExcelDao {
             lb = new Label(2, school.getClasses().size() + 4, "累计人数", border);
             sheet[8].addCell(lb);
             int tt = 0;
-            for (int i = 0; i < school.getXScoreDang().length; i++) {
-                lb = new Label(0, school.getClasses().size() + 5 + i, (school.getXScoreDang()[school.getXScoreDang().length - i - 1] - school.getXScore() + 1) + "-" + school.getXScoreDang()[school.getXScoreDang().length - i - 1], border);
+            for (int i = 0; i < school.getxScoreDang().length; i++) {
+                lb = new Label(0, school.getClasses().size() + 5 + i, (school.getxScoreDang()[school.getxScoreDang().length - i - 1] - school.getxScore() + 1) + "-" + school.getxScoreDang()[school.getxScoreDang().length - i - 1], border);
                 sheet[8].addCell(lb);
-                num = new Number(1, school.getClasses().size() + 5 + i, school.getXScoreDangStuNum()[school.getXScoreDang().length - i - 1], border);
+                num = new Number(1, school.getClasses().size() + 5 + i, school.getxScoreDangStuNum()[school.getxScoreDang().length - i - 1], border);
                 sheet[8].addCell(num);
-                tt += school.getXScoreDangStuNum()[school.getXScoreDang().length - i - 1];
+                tt += school.getxScoreDangStuNum()[school.getxScoreDang().length - i - 1];
                 num = new Number(2, school.getClasses().size() + 5 + i, tt, border);
                 sheet[8].addCell(num);
             }
@@ -419,7 +419,7 @@ public class ExcelDao {
 
             }
             // -------------------光荣榜-------------------
-            List<List<Map<Integer, List<StudentBean>>>> grb = school.getGRB();
+            List<List<Map<Integer, List<StudentBean>>>> grb = school.getGlories();
             WritableSheet[] grbSheet = new WritableSheet[grb.size()];// 创建一个工作表
             for (int classTypeIndex = 0; classTypeIndex < grb.size(); classTypeIndex++) {
                 grbSheet[classTypeIndex] = wb.createSheet(settings.getGRBClassTypeText()[classTypeIndex] + "班光荣榜", sheet.length + classTypeIndex);

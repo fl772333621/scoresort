@@ -10,6 +10,9 @@ package com.mfanw.scoresort.utils;
  */
 public class ExceptionUtil {
 
+    private ExceptionUtil() {
+    }
+
     public static String printStackTraceMgr(StackTraceElement[] stes) {
         StackTraceElement ste;
         StringBuilder sb = new StringBuilder();
