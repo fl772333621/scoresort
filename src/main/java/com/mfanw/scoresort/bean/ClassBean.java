@@ -48,7 +48,7 @@ public class ClassBean {
 
     private ScoreSortSettings settings;
 
-    public ClassBean(ScoreSortSettings settings, int classIndex, String className, List<StudentBean> students) {
+    ClassBean(ScoreSortSettings settings, int classIndex, String className, List<StudentBean> students) {
         this.settings = settings;
         this.classIndex = classIndex;
         this.className = className;
@@ -75,9 +75,9 @@ public class ClassBean {
      */
     private void initAverage() {
         this.averages = new double[this.settings.getKeMuSize()];
-        for (int i = 0; i < students.size(); i++) {
+        for (StudentBean student : students) {
             for (int keMu = 0; keMu < this.settings.getKeMuSize(); keMu++) {
-                this.averages[keMu] += students.get(i).getScores()[keMu];
+                this.averages[keMu] += student.getScores()[keMu];
             }
         }
         for (int keMu = 0; keMu < this.settings.getKeMuSize(); keMu++) {
@@ -94,12 +94,12 @@ public class ClassBean {
         for (int keMu = 0; keMu < this.settings.getKeMuSize(); keMu++) {
             this.scoresHigh[keMu] = students.get(0).getScores()[keMu];
             this.scoresLow[keMu] = students.get(0).getScores()[keMu];
-            for (int i = 0; i < students.size(); i++) {
-                if (students.get(i).getScores()[keMu] > this.scoresHigh[keMu]) {
-                    this.scoresHigh[keMu] = students.get(i).getScores()[keMu];
+            for (StudentBean student : students) {
+                if (student.getScores()[keMu] > this.scoresHigh[keMu]) {
+                    this.scoresHigh[keMu] = student.getScores()[keMu];
                 }
-                if (students.get(i).getScores()[keMu] < this.scoresLow[keMu]) {
-                    this.scoresLow[keMu] = students.get(i).getScores()[keMu];
+                if (student.getScores()[keMu] < this.scoresLow[keMu]) {
+                    this.scoresLow[keMu] = student.getScores()[keMu];
                 }
             }
         }
@@ -136,9 +136,6 @@ public class ClassBean {
         }
     }
 
-    /**
-     *
-     */
     public void initLevelDegreeDetails(ScoreSortSettings settings) {
         this.levelDegreeDetails = new int[settings.getKeMuSize()][settings.getCutNum() + 1];
     }

@@ -214,17 +214,14 @@ public class SchoolBean {
             settings.setCutNum(settings.getDistributionPercent().length);
             for (int keMu = 0; keMu < settings.getKeMuSize(); keMu++) {
                 final int keMuIndex = keMu;
-                students.sort(new Comparator<StudentBean>() {
-                    @Override
-                    public int compare(StudentBean o1, StudentBean o2) {
-                        if (o1 == null || o1.getScores() == null || o1.getScores().length < keMuIndex) {
-                            return -1;
-                        }
-                        if (o2 == null || o2.getScores() == null || o2.getScores().length < keMuIndex) {
-                            return 1;
-                        }
-                        return new Double(o1.getScores()[keMuIndex]).compareTo(o2.getScores()[keMuIndex]);
+                students.sort((o1, o2) -> {
+                    if (o1 == null || o1.getScores() == null || o1.getScores().length < keMuIndex) {
+                        return -1;
                     }
+                    if (o2 == null || o2.getScores() == null || o2.getScores().length < keMuIndex) {
+                        return 1;
+                    }
+                    return Double.compare(o1.getScores()[keMuIndex], o2.getScores()[keMuIndex]);
                 });
                 Collections.reverse(students);
                 double[] degreeLScore = new double[settings.getDistributionPercent().length];
@@ -388,13 +385,13 @@ public class SchoolBean {
     private void initClassDetails() {
         // 班级内学生列表，存储所有的<班级名称, 班级内学生>
         HashMap<String, List<StudentBean>> classStudents = new HashMap<>();
-        for (int i = 0; i < students.size(); i++) {
-            List<StudentBean> classStudent = classStudents.get(students.get(i).getClassName());
+        for (StudentBean student : students) {
+            List<StudentBean> classStudent = classStudents.get(student.getClassName());
             if (classStudent == null) {
                 classStudent = new ArrayList<>();
             }
-            classStudent.add(students.get(i));
-            classStudents.put(students.get(i).getClassName(), classStudent);
+            classStudent.add(student);
+            classStudents.put(student.getClassName(), classStudent);
         }
         String[] classNames = classStudents.keySet().toArray(new String[0]);
         ArrayList<String> classNameList = new ArrayList<>(Arrays.asList(classNames));
@@ -411,9 +408,9 @@ public class SchoolBean {
      * @return -1表示不在，其余表示在
      */
     private int findBJIndex(String className) {
-        for (int i = 0; i < this.classes.size(); i++) {
-            if (className.equals(this.classes.get(i).getClassName())) {
-                return this.classes.get(i).getClassIndex();
+        for (ClassBean aClass : this.classes) {
+            if (className.equals(aClass.getClassName())) {
+                return aClass.getClassIndex();
             }
         }
         return -1;
@@ -465,8 +462,8 @@ public class SchoolBean {
         }
         // 开始统计,填充统计列表
         double tZF = 0;
-        for (int i = 0; i < students.size(); i++) {
-            tZF = students.get(i).getScores()[this.settings.getKeMuSize() - 1];
+        for (StudentBean student : students) {
+            tZF = student.getScores()[this.settings.getKeMuSize() - 1];
             // 从小到大循环分档，直到找到合适的分档（从小到大分档分数线逐渐提高）
             for (int mm = 0; mm < xScoreDang.length; mm++) {
                 if (tZF < xScoreDang[mm]) {
