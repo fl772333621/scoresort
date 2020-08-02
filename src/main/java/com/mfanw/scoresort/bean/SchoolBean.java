@@ -24,9 +24,9 @@ public class SchoolBean {
     /**
      * 全部学生
      */
-    private List<StudentBean> students;
+    private final List<StudentBean> students;
 
-    private List<ClassBean> classes = new ArrayList<>();
+    private final List<ClassBean> classes = new ArrayList<>();
 
     /**
      * 总分最高分
@@ -53,17 +53,6 @@ public class SchoolBean {
     private int[] xScoreDangStuNum;
 
     /**
-     * 每个班学生数目
-     */
-    private int[] numPerBanJi;
-
-    /**
-     * 名次档详情<br />
-     * mcdDetail[班级][科目][名次档索引]
-     */
-    private int[][][] mcdDetail;
-
-    /**
      * 名次档累计详情<br />
      * mcdDetail[班级][科目][名次档索引]
      */
@@ -72,9 +61,9 @@ public class SchoolBean {
     /**
      * 光荣榜[班类][科目][名次][学生]
      */
-    private List<List<Map<Integer, List<StudentBean>>>> glories = new ArrayList<>();
+    private final List<List<Map<Integer, List<StudentBean>>>> glories = new ArrayList<>();
 
-    private ScoreSortSettings settings;
+    private final ScoreSortSettings settings;
 
     /**
      * 构造函数
@@ -91,7 +80,7 @@ public class SchoolBean {
     public void mainHandler() {
         this.handleDistribution();
         // X分一档
-        this.handleXScoreDegree(this.scoresHigh[6], this.scoresLow[6]);
+        this.handleXScoreDegree();
         // 分数等级划分
         this.handleScoreLevel();
         // 名次档
@@ -113,7 +102,7 @@ public class SchoolBean {
                 if (o2 == null || o2.getScores() == null || o2.getScores().length < keMuIndex) {
                     return 1;
                 }
-                return new Double(o1.getScores()[keMuIndex]).compareTo(o2.getScores()[keMuIndex]);
+                return Double.compare(o1.getScores()[keMuIndex], o2.getScores()[keMuIndex]);
             });
             Collections.reverse(students);
             double[] degreeHScore = new double[settings.getDistributionPercent().length];
@@ -157,13 +146,13 @@ public class SchoolBean {
                 }
             }
         }
-        for (int j = 0; j < students.size(); j++) {
-            double[] scores = students.get(j).getScores();
+        for (StudentBean student : students) {
+            double[] scores = student.getScores();
             double total = 0;
             for (int i = 0; i < 6; i++) {
                 total += scores[i];
             }
-            students.get(j).setScoreByIndex(6, total);
+            student.setScoreByIndex(6, total);
         }
     }
 
@@ -199,7 +188,7 @@ public class SchoolBean {
                 for (StudentBean stu : cla.getStudents()) {
                     for (int keMu = 0; keMu < settings.getKeMuSize(); keMu++) {
                         int temp = scoreLevel(settings.getDegreeScores()[keMu], stu.getScores()[keMu]);
-                        String stuDegree = null;
+                        String stuDegree;
                         if (temp != -1) {
                             stuDegree = "" + (char) (65 + temp);
                         } else {
@@ -241,7 +230,7 @@ public class SchoolBean {
                 for (StudentBean stu : cla.getStudents()) {
                     for (int keMu = 0; keMu < settings.getKeMuSize(); keMu++) {
                         int temp = scoreLevel(settings.getDegreeScores()[keMu], stu.getScores()[keMu]);
-                        String stuDegree = null;
+                        String stuDegree;
                         if (temp != -1) {
                             stuDegree = settings.getDistributionName()[temp];
                         } else {
@@ -274,12 +263,13 @@ public class SchoolBean {
         if (settings.getMingCiFenDang().length <= 0) {
             return;
         }
-        this.mcdDetail = new int[this.classes.size()][this.settings.getKeMuSize()][settings.getMingCiFenDang().length + 1];
+        // 名次档详情 mcdDetail[班级][科目][名次档索引]
+        int[][][] mcdDetail = new int[this.classes.size()][this.settings.getKeMuSize()][settings.getMingCiFenDang().length + 1];
         // 默认设置各档都是0
         for (int i = 0; i < this.classes.size(); i++) {
             for (int j = 0; j < this.settings.getKeMuSize(); j++) {
                 for (int k = 0; k < settings.getMingCiFenDang().length + 1; k++) {
-                    this.mcdDetail[i][j][k] = 0;
+                    mcdDetail[i][j][k] = 0;
                 }
             }
         }
@@ -292,7 +282,7 @@ public class SchoolBean {
             for (int i = 0; i < this.settings.getKeMuSize(); i++) {
                 int tempMingCiDang = judgeMingCiDang(student.getScoresRankSchool()[i]);
                 if (tempMingCiDang >= 0) {
-                    this.mcdDetail[banJiIndex][i][tempMingCiDang]++;
+                    mcdDetail[banJiIndex][i][tempMingCiDang]++;
                 }
             }
         }
@@ -337,10 +327,6 @@ public class SchoolBean {
         return students;
     }
 
-    public void setStudents(List<StudentBean> students) {
-        this.students = students;
-    }
-
     /**
      * 获取学校的全部班级，班级是有序的，名称从小到大
      */
@@ -358,25 +344,10 @@ public class SchoolBean {
     }
 
     /**
-     * mcdDetail[班级][科目][名次档索引]
-     */
-    public int[][][] getMcdDetail() {
-        return mcdDetail;
-    }
-
-    public void setMcdDetail(int[][][] mCDDetail) {
-        mcdDetail = mCDDetail;
-    }
-
-    /**
      * getMcdDetailTotal[班级][科目][名次档索引]
      */
     public int[][][] getMcdDetailTotal() {
         return mcdDetailTotal;
-    }
-
-    public void setMcdDetailTotal(int[][][] mCDDetailTotal) {
-        mcdDetailTotal = mCDDetailTotal;
     }
 
     /**
@@ -440,7 +411,7 @@ public class SchoolBean {
     /**
      * 根据最高分和最低分以及偏差获取分档表，存储在XScoreDang中
      */
-    private void handleXScoreDegree(double high, double low) {
+    private void handleXScoreDegree() {
         // 正常的偏差是0，偏差的计算方法是 Low+x-1-第一个存储值 x表示x分一档
         int scoreDegreePC = settings.getScoreDegreePC();
         long zfHigh = Math.round(getScoresHigh()[this.settings.getKeMuSize() - 1]);
@@ -457,11 +428,9 @@ public class SchoolBean {
         // 创建统计列表
         xScoreDangStuNum = new int[fdNum];
         // 初始化统计列表
-        for (int i = 0; i < xScoreDangStuNum.length; i++) {
-            xScoreDangStuNum[i] = 0;
-        }
+        Arrays.fill(xScoreDangStuNum, 0);
         // 开始统计,填充统计列表
-        double tZF = 0;
+        double tZF;
         for (StudentBean student : students) {
             tZF = student.getScores()[this.settings.getKeMuSize() - 1];
             // 从小到大循环分档，直到找到合适的分档（从小到大分档分数线逐渐提高）
@@ -505,16 +474,8 @@ public class SchoolBean {
         return scoresHigh;
     }
 
-    public void setScoresHigh(double[] scoresHigh) {
-        this.scoresHigh = scoresHigh;
-    }
-
     public double[] getScoresLow() {
         return scoresLow;
-    }
-
-    public void setScoresLow(double[] scoresLow) {
-        this.scoresLow = scoresLow;
     }
 
     public int getxScore() {
@@ -531,18 +492,6 @@ public class SchoolBean {
 
     public int[] getxScoreDangStuNum() {
         return xScoreDangStuNum;
-    }
-
-    public void setxScoreDangStuNum(int[] xScoreDangStuNum) {
-        this.xScoreDangStuNum = xScoreDangStuNum;
-    }
-
-    public int[] getNumPerBanJi() {
-        return numPerBanJi;
-    }
-
-    public void setNumPerBanJi(int[] numPerBanJi) {
-        this.numPerBanJi = numPerBanJi;
     }
 
     public List<List<Map<Integer, List<StudentBean>>>> getGlories() {

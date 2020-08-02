@@ -12,8 +12,8 @@ import java.io.File;
  */
 public final class ExcelFilter extends FileFilter {
 
-    private String ext;
-    private String des;
+    private final String ext;
+    private final String des;
 
     public ExcelFilter(String ext, String des) {
         super();

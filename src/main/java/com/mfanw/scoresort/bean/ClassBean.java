@@ -10,17 +10,17 @@ public class ClassBean {
     /**
      * 班级序号
      */
-    private int classIndex;
+    private final int classIndex;
 
     /**
      * 班级名称
      */
-    private String className;
+    private final String className;
 
     /**
      * 班级内全部学生
      */
-    private List<StudentBean> students;
+    private final List<StudentBean> students;
 
     /**
      * 每个班每个等级的计数器，degreeDetails[科目][等级]
@@ -46,7 +46,7 @@ public class ClassBean {
      */
     private double[] scoresLow;
 
-    private ScoreSortSettings settings;
+    private final ScoreSortSettings settings;
 
     ClassBean(ScoreSortSettings settings, int classIndex, String className, List<StudentBean> students) {
         this.settings = settings;
@@ -152,16 +152,8 @@ public class ClassBean {
         return scoresHigh;
     }
 
-    public void setScoresHigh(double[] scoresHigh) {
-        this.scoresHigh = scoresHigh;
-    }
-
     public double[] getScoresLow() {
         return scoresLow;
-    }
-
-    public void setScoresLow(double[] scoresLow) {
-        this.scoresLow = scoresLow;
     }
 
 }

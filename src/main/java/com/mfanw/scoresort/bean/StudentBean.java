@@ -4,29 +4,29 @@ import com.mfanw.scoresort.utils.ScoreSortUtil;
 
 public class StudentBean {
 
-    private String className;
-    private String code;
-    private String name;
+    private final String className;
+    private final String code;
+    private final String name;
 
     /**
      * 各科成绩
      */
-    private double[] scores;
+    private final double[] scores;
 
     /**
      * 各科等级
      */
-    private String[] scoresDegree;
+    private final String[] scoresDegree;
 
     /**
      * 各科的班级排名
      */
-    private int[] scoresRankClass;
+    private final int[] scoresRankClass;
 
     /**
      * 各科的学校排名
      */
-    private int[] scoresRankSchool;
+    private final int[] scoresRankSchool;
 
     public StudentBean(String code, String name, String className, double[] scores) {
         this.code = code;

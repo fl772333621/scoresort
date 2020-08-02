@@ -26,7 +26,7 @@ public class ExcelDao {
 
     private static Sheet sheet = null;
 
-    private static String[] subjects = new String[7];
+    private static final String[] subjects = new String[7];
 
     private ExcelDao() {
     }
@@ -54,8 +54,7 @@ public class ExcelDao {
             // 过滤第一行，第一行为表头
             for (int i = 1; i < sHCount; i++) {
                 String tempStr = tStr(2, i).trim();
-                if (tempStr.length() == 0) {
-                } else {
+                if (tempStr.length() != 0) {
                     double[] scores = new double[]{toDouble(3, i), toDouble(4, i), toDouble(5, i), toDouble(6, i), toDouble(7, i), toDouble(8, i)};
                     StudentBean stu = new StudentBean(tStr(0, i), tStr(1, i), tStr(2, i), scores);
                     xlsContents.add(stu);
@@ -63,8 +62,6 @@ public class ExcelDao {
             }
             wb.close();
             is.close();
-        } catch (Exception e) {
-            throw e;
         } finally {
             try {
                 if (wb != null) {
@@ -73,7 +70,7 @@ public class ExcelDao {
                 if (is != null) {
                     is.close();
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
         return xlsContents;
@@ -102,7 +99,7 @@ public class ExcelDao {
             }
             wb.close();
             is.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         } finally {
             try {
@@ -112,30 +109,26 @@ public class ExcelDao {
                 if (is != null) {
                     is.close();
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
         return xlsContents;
     }
 
     public static String tStr(int i, int j) {
-        String s = "";
         try {
-            s = sheet.getCell(i, j).getContents();
+            return sheet.getCell(i, j).getContents();
         } catch (Exception e) {
-            s = "";
+            return "";
         }
-        return s;
     }
 
     public static double toDouble(int i, int j) {
-        double f = 0;
         try {
-            f = Double.parseDouble(sheet.getCell(i, j).getContents());
+            return Double.parseDouble(sheet.getCell(i, j).getContents());
         } catch (Exception e) {
-            f = 0;
+            return 0;
         }
-        return f;
     }
 
     /**
@@ -145,10 +138,9 @@ public class ExcelDao {
      */
     public static void saveExcel(String xlsPath, List<StudentBean> stus, SchoolBean school, ScoreSortSettings settings) {
         stus = new ArrayList<>(stus);
-        WritableWorkbook wb = null;
-        OutputStream os = null;
-        try {
-            os = new FileOutputStream(xlsPath);// 文件写出的路径
+        WritableWorkbook wb;
+        try (OutputStream os = new FileOutputStream(xlsPath)) {
+            // 文件写出的路径
             wb = Workbook.createWorkbook(os);// 创建一个工作簿
             WritableSheet[] sheet = new WritableSheet[10];
             sheet[0] = wb.createSheet("数据总表", 0);// 创建一个工作表
@@ -159,8 +151,8 @@ public class ExcelDao {
             sheet[9] = wb.createSheet("名次表", 9);// 创建一个工作表
 
             // 公共变量
-            Label lb = null;
-            Number num = null;
+            Label lb;
+            Number num;
             // 百分比格式的单元格
             WritableFont wf = new WritableFont(WritableFont.ARIAL, 10, WritableFont.NO_BOLD, false);
             DisplayFormat displayFormat = NumberFormats.PERCENT_FLOAT;
@@ -481,20 +473,20 @@ public class ExcelDao {
                     // 科目内具体信息
                     for (int mc : mcArray) {
                         List<StudentBean> grbStus = grbInfo.get(mc);
-                        for (int sIndex = 0; sIndex < grbStus.size(); sIndex++) {
+                        for (StudentBean studentBean : grbStus) {
                             num = new Number(keMu * keMuSpace, yIndexTemp + 2, mc, border);
                             grbSheet[classTypeIndex].addCell(num);
-                            lb = new Label(keMu * keMuSpace + 1, yIndexTemp + 2, grbStus.get(sIndex).getClassName(), border);
+                            lb = new Label(keMu * keMuSpace + 1, yIndexTemp + 2, studentBean.getClassName(), border);
                             grbSheet[classTypeIndex].addCell(lb);
-                            lb = new Label(keMu * keMuSpace + 2, yIndexTemp + 2, grbStus.get(sIndex).getCode(), border);
+                            lb = new Label(keMu * keMuSpace + 2, yIndexTemp + 2, studentBean.getCode(), border);
                             grbSheet[classTypeIndex].addCell(lb);
-                            lb = new Label(keMu * keMuSpace + 3, yIndexTemp + 2, grbStus.get(sIndex).getName(), border);
+                            lb = new Label(keMu * keMuSpace + 3, yIndexTemp + 2, studentBean.getName(), border);
                             grbSheet[classTypeIndex].addCell(lb);
-                            num = new Number(keMu * keMuSpace + 4, yIndexTemp + 2, grbStus.get(sIndex).getScoresRankClass()[keMu], border);
+                            num = new Number(keMu * keMuSpace + 4, yIndexTemp + 2, studentBean.getScoresRankClass()[keMu], border);
                             grbSheet[classTypeIndex].addCell(num);
-                            num = new Number(keMu * keMuSpace + 5, yIndexTemp + 2, grbStus.get(sIndex).getScoresRankSchool()[keMu], border);
+                            num = new Number(keMu * keMuSpace + 5, yIndexTemp + 2, studentBean.getScoresRankSchool()[keMu], border);
                             grbSheet[classTypeIndex].addCell(num);
-                            num = new Number(keMu * keMuSpace + 6, yIndexTemp + 2, grbStus.get(sIndex).getScores()[keMu], border);
+                            num = new Number(keMu * keMuSpace + 6, yIndexTemp + 2, studentBean.getScores()[keMu], border);
                             grbSheet[classTypeIndex].addCell(num);
                             yIndexTemp++;
                         }
@@ -505,11 +497,6 @@ public class ExcelDao {
             wb.close();
         } catch (Exception e) {
 //            throw e;
-        } finally {
-            try {
-                os.close();
-            } catch (Exception e) {
-            }
         }
     }
 }
